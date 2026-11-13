@@ -41,6 +41,7 @@ ocinbox/
 │   ├── oh-my-opencode-slim.jsonc
 │   ├── service.json           # MCP server configurations
 │   ├── AGENTS.md              # Optional global instructions
+│   ├── oh-my-opencode-slim    # oh-my-opencode-slim agents append files
 │   └── skills/                # SKILL.md directories (skills must exists, subdirs are optional)
 │       ├── caveman/           # Caveman skill
 │       ├── ponytail/          # Ponytail skill
@@ -64,8 +65,6 @@ ocinbox/
 ```bash
 git clone git@github.com:vadmbertr/ocinbox.git
 cd ocinbox
-chmod +x oc build.sh ocxerj
-mkdir -p config/skills home
 ```
 
 ### 2. Set up local mounts: `dirs.txt`
@@ -221,4 +220,4 @@ Docker/OrbStack on local           Apptainer pull on HPC
                                     -> opencode.sif
 ```
 
-An OCI registry image is an **input** to Apptainer; the HPC cluster still runs a local `.sif`. The image must have a build for the cluster's CPU architecture (typically `linux/amd64`). The `oc` launcher references `ocinbox:local` on local and `opencode.sif` on Linux.
+An OCI registry image is an **input** to Apptainer; the HPC cluster still runs a local `.sif`. The image must have a build for the cluster's CPU architecture (typically `linux/amd64`). The `oc` launcher references `ocinbox:local` on local and `opencode.sif` on HPC.

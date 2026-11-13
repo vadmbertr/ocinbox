@@ -131,7 +131,6 @@ else
         "${binds[@]}" \
         --pwd "$WORKDIR" \
         "${env_args[@]}" \
-        --env HOME=/home/oc \
         --env XDG_CONFIG_HOME=/home/oc/.config \
         --env XDG_DATA_HOME=/home/oc/.local/share \
         --env XDG_CACHE_HOME=/home/oc/.cache \
