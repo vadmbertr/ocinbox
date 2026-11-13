@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BOX="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+# Select runtime
+case "$(uname -s)" in
+    Darwin)
+        RUNTIME=docker
+        IMAGE="ocinbox:local"
+        ;;
+    Linux)
+        RUNTIME=apptainer
+        IMAGE="$BOX/opencode.sif"
+        ;;
+    *)
+        echo "Unsupported operating system" >&2
+        exit 1
+        ;;
+esac
+
+command -v "$RUNTIME" >/dev/null || {
+    echo "Missing runtime: $RUNTIME" >&2
+    exit 1
+}
+
+# Persistent home
+mkdir -p "$BOX/home"
+
+# Prepare writable OpenCode configuration
+OC_CONFIG="$BOX/home/.config/opencode"
+mkdir -p "$OC_CONFIG/skills"
+
+# Copy Git-tracked configuration
+if [[ -f "$BOX/config/opencode.jsonc" ]]; then
+    cp "$BOX/config/opencode.jsonc" \
+       "$OC_CONFIG"
+fi
+if [[ -f "$BOX/config/oh-my-opencode-slim.jsonc" ]]; then
+    cp "$BOX/config/oh-my-opencode-slim.jsonc" \
+       "$OC_CONFIG"
+fi
+
+# Copy custom skills
+if [[ -d "$BOX/config/skills" ]]; then
+    cp -R "$BOX/config/skills/." \
+       "$OC_CONFIG/skills/"
+fi
+
+# Copy global agent instructions
+if [[ -f "$BOX/config/AGENTS.md" ]]; then
+    cp "$BOX/config/AGENTS.md" \
+       "$OC_CONFIG/AGENTS.md"
+fi
+
+# Read bind configuration
+binds=()
+DIRS="${OC_DIRS:-$BOX/dirs.txt}"
+
+if [[ -f "$DIRS" ]]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        # Ignore blank lines and comments
+        [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+        [[ "$line" =~ ^[[:space:]]*\# ]] && continue
+
+        # Default to rw
+        if [[ "$line" != *:ro && "$line" != *:rw ]]; then
+            line="$line:rw"
+        fi
+
+        # Both runtimes accept source:target:mode
+        if [[ "$RUNTIME" == docker ]]; then
+            binds+=(-v "$line")
+        else
+            binds+=(--bind "$line")
+        fi
+    done < "$DIRS"
+fi
+
+# Optional credentials
+env_args=()
+if [[ -f "$BOX/secrets.env" ]]; then
+    env_args+=(--env-file "$BOX/secrets.env")
+fi
+
+# Optional starting project, e.g. OC_PROJECT=project-a
+PROJECT="${OC_PROJECT:-}"
+if [[ -n "$PROJECT" ]]; then
+    if [[ "$PROJECT" == /* || "$PROJECT" == *..* ]]; then
+        echo "OC_PROJECT must be a relative project path" >&2
+        exit 1
+    fi
+fi
+WORKDIR="/workspace${PROJECT:+/$PROJECT}"
+
+if [[ "$RUNTIME" == docker ]]; then
+
+    # Allocate a TTY when running interactively
+    tty_args=()
+    if [[ -t 0 && -t 1 ]]; then
+        tty_args=(-it)
+    fi
+
+    exec docker run --rm \
+        "${tty_args[@]}" \
+        --user "$(id -u):$(id -g)" \
+        -v "$BOX/home:/home/oc:rw" \
+        -v "ocinbox-xerj:/home/oc/.local/share/xerj:rw" \
+        "${binds[@]}" \
+        -w "$WORKDIR" \
+        "${env_args[@]}" \
+        -e HOME=/home/oc \
+        -e XDG_CONFIG_HOME=/home/oc/.config \
+        -e XDG_DATA_HOME=/home/oc/.local/share \
+        -e XDG_CACHE_HOME=/home/oc/.cache \
+        -e OC_XERJ_INDEX="${OC_XERJ_INDEX:-0}" \
+        -e TERM="${TERM:-xterm-256color}" \
+        "$IMAGE" \
+        /usr/local/bin/ocxerj "$@"
+
+else
+
+    exec apptainer exec \
+        --containall \
+        --home "$BOX/home:/home/oc" \
+        "${binds[@]}" \
+        --pwd "$WORKDIR" \
+        "${env_args[@]}" \
+        --env HOME=/home/oc \
+        --env XDG_CONFIG_HOME=/home/oc/.config \
+        --env XDG_DATA_HOME=/home/oc/.local/share \
+        --env XDG_CACHE_HOME=/home/oc/.cache \
+        --env OC_XERJ_INDEX="${OC_XERJ_INDEX:-0}" \
+        --env TERM="${TERM:-xterm-256color}" \
+        "$IMAGE" \
+        /usr/local/bin/ocxerj "$@"
+
+fi

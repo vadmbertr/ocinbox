@@ -1,0 +1,23 @@
+
+# Local runtime state
+/home/
+/config/service.json
+
+# Machine-specific configuration
+/dirs.txt
+/secrets.env
+
+# Generated container images
+/*.sif
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# macOS
+.DS_Store

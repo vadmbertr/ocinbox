@@ -1,0 +1,13 @@
+# Example directory mappings for ocinbox
+# Copy this to dirs.txt and edit for your local paths
+# Format: HOST_PATH:CONTAINER_PATH[:ro|rw]
+# Lines starting with # are comments
+# Default permission is rw (read-write)
+
+# macOS example:
+# /Users/YOU/projects:/workspace:rw
+# /Users/YOU/data:/data:ro
+
+# HPC/Linux example:
+# /cluster/path/to/projects:/workspace:rw
+# /cluster/path/to/data:/data:ro

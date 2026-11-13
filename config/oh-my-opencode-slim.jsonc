@@ -1,0 +1,87 @@
+{
+  "$schema": "https://unpkg.com/oh-my-opencode-slim@latest/oh-my-opencode-slim.schema.json",
+  "preset": "main",
+  "autoUpdate": false,
+  "disabled_agents": [],
+  "image_routing": "auto",
+  "presets": {
+    "main": {
+      "orchestrator": {
+        "model": [
+          { "id": "mistral/zai-glm-5-3", "variant": "high" }
+        ],
+        "skills": ["*"],
+        "mcps": ["*", "!context7"]
+      },
+      "oracle": {
+        "model": [
+          { "id": "mistral/zai-glm-5-3", "variant": "high" }
+        ],
+        "skills": ["simplify", "ponytail-review", "ponytail-audit"],
+        "mcps": []
+      },
+      "explorer": {
+        "model": [
+          "alan/ARES/gpt-oss-120b",
+          "alan/mimo-v26-flash-mopd",
+          "alan/ILAAS/.qwen-3.6-35b-instruct",
+          "alan/ILAAS/.mistral-medium-latest"
+        ],
+        "skills": ["caveman"],
+        "mcps": []
+      },
+      "librarian": {
+        "model": [
+          "alan/mimo-v26-flash-mopd",
+          "alan/ARES/gpt-oss-120b",
+          "alan/ILAAS/.mistral-medium-latest"
+        ],
+        "skills": ["caveman"],
+        "mcps": ["context7", "gh_grep"]
+      },
+      "designer": {
+        "model": [
+          { "id": "mistral/zai-glm-5-3-flash", "variant": "high" },
+          "alan/mimo-v26-flash-mopd"
+        ],
+        "skills": ["ponytail"],
+        "mcps": []
+      },
+      "fixer": {
+        "model": [
+          { "id": "mistral/zai-glm-5-3-flash", "variant": "high" },
+          "alan/mimo-v26-flash-mopd"
+        ],
+        "skills": ["ponytail"],
+        "mcps": []
+      },
+      "observer": {
+        "displayName": "multimodal-looker",
+        "model": [
+          { "id": "mistral/zai-glm-5-3", "variant": "low" }
+        ],
+        "skills": [],
+        "mcps": []
+      },
+      "council": {
+        "model": [
+          { "id": "mistral/zai-glm-5-3", "variant": "high" }
+        ],
+        "skills": [],
+        "mcps": []
+      }
+    }
+  },
+  "backgroundJobs": {
+    "concurrency": {
+      "defaultConcurrency": 3,
+      "providerConcurrency": { "alan": 0 }
+    },
+    "wallClockTimeoutMs": 900000
+  },
+  "fallback": {
+    "enabled": true,
+    "maxRetries": 1,
+    "retryDelayMs": 500
+  }
+}

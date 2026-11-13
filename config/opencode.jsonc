@@ -1,0 +1,58 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": [ "oh-my-opencode-slim@3.0.5" ],
+  "experimental": { "subagent_depth": 2 },
+  "providers": {
+    "alan": {
+      "name": "Alan",
+      "env": ["ALAN_API_KEY"],
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "https://alan.univ-grenoble-alpes.fr/api/v1",
+        "apiKey": "{env:ALAN_API_KEY}"
+      },
+      "models": {
+        "ILAAS/.mistral-medium-latest": {
+          "name": "Mistral Medium 3.5 128B (large)"
+        },
+        "ILAAS/.mistral-small-4-119b": {
+          "name": "Mistral Small 4 119b (large)"
+        },
+        "ILAAS/.qwen-3.6-35b-instruct": {
+          "name": "Qwen 3.6 35b instruct (medium)"
+        },
+        "ILAAS/.qwen-3.8-27b": {
+          "name": "Qwen 3.8 27b (medium)"
+        },
+        "ILAAS/.gemma-4-31b": {
+          "name": "Gemma 4 31b (medium)"
+        },
+        "ILAAS/.llama-3.1-8b": {
+          "name": "Llama 3.1 8b (small)"
+        },
+        "ARES/gpt-oss-120b": {
+          "name": "GPT-OSS 120B (large)"
+        },
+        "mimo-v26-flash-mopd": {
+          "name": "MiMo-V2.6-Flash 309B (large)"
+        }
+      }
+    },
+    "mistral": {
+      "settings": {
+        "apiKey": "{env:MISTRAL_API_KEY}"
+      }
+    }
+  },
+  "mcp": {
+    "servers": {
+      "xerj": {
+        "type": "local",
+        "command": ["/usr/local/bin/xerj", "mcp"],
+        "environment": {
+          "XERJ_URL": "http://127.0.0.1:9200"
+        }
+      }
+    }
+  }
+}

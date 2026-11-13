@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+XERJ_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/xerj"
+# needs to run on every volume creation (so once only)
+# docker run --rm --user 0 \
+#   -v ocinbox-xerj:/data \
+#   alpine:3.20 \
+#   chown "$(id -u):$(id -g)" /data
+mkdir -p "$XERJ_DATA"
+
+# Start the XERJ engine with authentication enabled.
+xerj --data-dir "$XERJ_DATA" > "$XERJ_DATA/xerj.log" 2>&1 &
+XERJ_PID=$!
+
+cleanup() {
+    kill "$XERJ_PID" 2>/dev/null || true
+    wait "$XERJ_PID" 2>/dev/null || true
+}
+trap cleanup EXIT
+
+# Wait for the generated API key on first startup.
+for i in {1..60}; do
+    [[ -s "$XERJ_DATA/admin.key" ]] && break
+    kill -0 "$XERJ_PID" 2>/dev/null || {
+        echo "XERJ exited unexpectedly" >&2
+        exit 1
+    }
+    sleep 1
+done
+
+[[ -s "$XERJ_DATA/admin.key" ]] || {
+    echo "XERJ API key unavailable" >&2
+    exit 1
+}
+
+export XERJ_API_KEY
+XERJ_API_KEY="$(cat "$XERJ_DATA/admin.key")"
+export XERJ_AUTH="ApiKey $XERJ_API_KEY"
+export XERJ_URL="http://127.0.0.1:9200"
+
+# Wait for the authenticated HTTP endpoint to respond.
+ready=false
+for i in {1..60}; do
+    status="$(curl -s -o /dev/null -w '%{http_code}' \
+        -H "Authorization: $XERJ_AUTH" \
+        "$XERJ_URL/" || true)"
+
+    if [[ "$status" != "000" && -n "$status" ]]; then
+        ready=true
+        break
+    fi
+    sleep 1
+done
+
+[[ "$ready" == true ]] || {
+    echo "XERJ did not become ready" >&2
+    exit 1
+}
+
+# Optional explicit reindexing
+if [[ "${OC_XERJ_INDEX:-0}" == "1" ]]; then
+    xerj autoindex "$PWD"
+fi
+
+# Configure GitHub HTTPS authentication
+if [[ -n "${GH_TOKEN:-}" ]]; then
+    gh auth setup-git --hostname github.com
+    git config --global \
+      url."https://github.com/".insteadOf \
+      "git@github.com:"
+fi
+
+opencode "$@"
