@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export HOME=/home/oc
+
 XERJ_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/xerj"
 # needs to run on every volume creation (so once only)
 # docker run --rm --user 0 \
-#   -v ocinbox-xerj:/data \
+#   -v ocbox-xerj:/data \
 #   alpine:3.20 \
 #   chown "$(id -u):$(id -g)" /data
 mkdir -p "$XERJ_DATA"
@@ -60,7 +62,13 @@ done
 
 # Optional explicit reindexing
 if [[ "${OC_XERJ_INDEX:-0}" == "1" ]]; then
-    xerj autoindex "$PWD"
+    xerj autoindex "$PWD" || {
+        status=$?
+        # XERJ uses exit 3 for successful indexing with skipped/junk files.
+        if [[ "$status" -ne 3 ]]; then
+            echo "XERJ autoindex failed with status $status; continuing to OpenCode" >&2
+        fi
+    }
 fi
 
 # Configure GitHub HTTPS authentication
