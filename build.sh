@@ -15,7 +15,7 @@ if command -v docker >/dev/null 2>&1; then
 elif command -v apptainer >/dev/null 2>&1; then
     RUNTIME=apptainer
 else
-    echo "Unsupported operating system" >&2
+    echo "Neither a working Docker runtime nor Apptainer is available" >&2
     exit 1
 fi
 
