@@ -1,4 +1,4 @@
-# ocinbox
+# ocbox
 
 Run **OpenCode V2** against an entire projects directory using **Docker (Docker Desktop or OrbStack) on local** and **Apptainer on HPC**. The container also includes [XERJ](https://github.com/xerj-org/xerj), a local search/index service launched alongside OpenCode.
 
@@ -8,7 +8,7 @@ It exposes one common `oc` command on both machines, with the same container pat
 
 | Host | Container runtime | Image | Project path inside container |
 | --- | --- | --- | --- |
-| local | Docker | `ocinbox:local` | `/workspace` |
+| local | Docker | `ocbox:local` | `/workspace` |
 | HPC | Apptainer | `opencode.sif` | `/workspace` |
 
 The launch script:
@@ -31,7 +31,7 @@ The container build fetches npm packages and XERJ from the internet. First-run O
 ## Repository layout
 
 ```text
-ocinbox/
+ocbox/
 ├── Dockerfile                 # Container dependencies
 ├── build.sh                   # Platform-specific build
 ├── oc                         # Cross-platform launcher
@@ -55,7 +55,7 @@ ocinbox/
 ├── dirs.txt                   # Local host paths; DO NOT commit
 ├── secrets.env                # Provider keys; DO NOT commit
 ├── home/                      # Persistent private runtime state; DO NOT commit
-└── opencode.sif               # Generated on Linux; DO NOT commit
+└── opencode.sif               # Generated on HPC; DO NOT commit
 ```
 
 ## Quick start
@@ -63,8 +63,8 @@ ocinbox/
 ### 1. Get the repository
 
 ```bash
-git clone git@github.com:vadmbertr/ocinbox.git
-cd ocinbox
+git clone git@github.com:vadmbertr/ocbox.git
+cd ocbox
 ```
 
 ### 2. Set up local mounts: `dirs.txt`
@@ -108,26 +108,26 @@ Never commit keys or OAuth/session files. For built-in providers and custom endp
 
 On **local**:
 
-- `./build.sh build` (or `./build.sh`) - Local Docker build tagged as `ocinbox:local`
-- `./build.sh publish` - Build and push multi-arch image to GHCR (default: `ghcr.io/vadmbertr/ocinbox:latest`)
-- `./build.sh sync` - Pull from GHCR and tag as `ocinbox:local`
+- `./build.sh build` (or `./build.sh`) - Local Docker build tagged as `ocbox:local`
+- `./build.sh publish` - Build and push multi-arch image to GHCR (default: `ghcr.io/vadmbertr/ocbox:latest`)
+- `./build.sh sync` - Pull from GHCR and tag as `ocbox:local`
 
 On **HPC**:
 
 - `./build.sh` - Pull OCI image from GHCR and convert to `opencode.sif`
 
-Override the default OCI image with: `ocinbox_IMAGE=ghcr.io/YOUR_ACCOUNT/ocinbox:VERSION ./build.sh [publish|sync]`
+Override the default OCI image with: `ocbox_IMAGE=ghcr.io/YOUR_ACCOUNT/ocbox:VERSION ./build.sh [publish|sync]`
 
 ### 5. Run
 
-From the `ocinbox` directory:
+From the `ocbox` directory:
 
 ```bash
 ./oc
 OC_PROJECT=project-a ./oc
 ```
 
-For a convenient `oc` command from anywhere, add your `ocinbox` directory to `PATH`, or create a shell alias pointing to the absolute path of `oc`.
+For a convenient `oc` command from anywhere, add your `ocbox` directory to `PATH`, or create a shell alias pointing to the absolute path of `oc`.
 
 `OC_PROJECT` sets the starting directory to `/workspace/<project>`. It does **not** limit OpenCode's access to other mounted projects. The relative project path must exist inside `/workspace`.
 
@@ -183,18 +183,18 @@ Ordinary runs (`./oc`) start XERJ without invoking that explicit `autoindex /wor
 
 ### local: XERJ Docker volume
 
-XERJ's index initialization failed in this setup when its data directory lived on a macOS-host bind mount, but succeeded on a Linux-native container filesystem. The launcher therefore mounts a persistent Docker named volume:
+XERJ's index initialization fails in this setup when its data directory lived on a macOS-host bind mount, but succeeds on a Linux-native container filesystem. The launcher therefore mounts a persistent Docker named volume:
 
 ```text
-ocinbox-xerj  ->  /home/oc/.local/share/xerj
+ocbox-xerj  ->  /home/oc/.local/share/xerj
 ```
 
 Create it and initialize ownership **once** for your local Docker UID/GID:
 
 ```bash
-docker volume create ocinbox-xerj
+docker volume create ocbox-xerj
 docker run --rm --user 0 \
-  -v ocinbox-xerj:/data \
+  -v ocbox-xerj:/data \
   alpine:3.20 \
   chown "$(id -u):$(id -g)" /data
 ```
@@ -220,4 +220,4 @@ Docker/OrbStack on local           Apptainer pull on HPC
                                     -> opencode.sif
 ```
 
-An OCI registry image is an **input** to Apptainer; the HPC cluster still runs a local `.sif`. The image must have a build for the cluster's CPU architecture (typically `linux/amd64`). The `oc` launcher references `ocinbox:local` on local and `opencode.sif` on HPC.
+An OCI registry image is an **input** to Apptainer; the HPC cluster still runs a local `.sif`. The image must have a build for the cluster's CPU architecture (typically `linux/amd64`). The `oc` launcher references `ocbox:local` on local and `opencode.sif` on HPC.
