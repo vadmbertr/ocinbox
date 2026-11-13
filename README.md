@@ -32,7 +32,7 @@ The container build fetches npm packages and XERJ from the internet. First-run O
 
 ```text
 ocinbox/
-├── Dockerfile                 # Container dependencies, macOS build
+├── Dockerfile                 # Container dependencies
 ├── build.sh                   # Platform-specific build
 ├── oc                         # Cross-platform launcher
 ├── ocxerj                     # Starts XERJ and OpenCode inside container
@@ -62,7 +62,7 @@ ocinbox/
 ### 1. Get the repository
 
 ```bash
-git clone https://github.com/vadmbertr/ocinbox.git
+git clone git@github.com:vadmbertr/ocinbox.git
 cd ocinbox
 chmod +x oc build.sh ocxerj
 mkdir -p config/skills home
