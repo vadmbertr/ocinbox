@@ -1,0 +1,1 @@
+Before coding-related work, load the ponytail skill unless already loaded. Before nontrivial implementation, load the verification-planning skill unless already loaded. Delegation does not load skills into child agents; instruct each child to load its relevant skills.

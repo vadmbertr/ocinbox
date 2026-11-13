@@ -1,0 +1,1 @@
+For change reviews, load ponytail-review; for repo-wide audits, load ponytail-audit; for behavior-preserving simplification, load simplify. Load only the skills relevant to the task, unless already loaded; do not load all unconditionally.

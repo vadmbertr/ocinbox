@@ -40,6 +40,11 @@ if [[ -f "$BOX/config/oh-my-opencode-slim.jsonc" ]]; then
     cp "$BOX/config/oh-my-opencode-slim.jsonc" \
        "$OC_CONFIG"
 fi
+if [[ -d "$BOX/config/oh-my-opencode-slim" ]]; then
+    mkdir -p "$OC_CONFIG/oh-my-opencode-slim"
+    cp -R "$BOX/config/oh-my-opencode-slim/." \
+       "$OC_CONFIG/oh-my-opencode-slim/"
+fi
 
 # Copy custom skills
 if [[ -d "$BOX/config/skills" ]]; then
