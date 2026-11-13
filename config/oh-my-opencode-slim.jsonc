@@ -18,7 +18,7 @@
           { "id": "mistral/zai-glm-5-3", "variant": "high" }
         ],
         "skills": ["simplify", "ponytail-review", "ponytail-audit"],
-        "mcps": []
+        "mcps": ["xerj"]
       },
       "explorer": {
         "model": [
@@ -28,7 +28,7 @@
           "alan/ILAAS/.mistral-medium-latest"
         ],
         "skills": ["caveman"],
-        "mcps": []
+        "mcps": ["xerj"]
       },
       "librarian": {
         "model": [
@@ -53,12 +53,12 @@
           "alan/mimo-v26-flash-mopd"
         ],
         "skills": ["ponytail"],
-        "mcps": []
+        "mcps": ["xerj"]
       },
       "observer": {
         "displayName": "multimodal-looker",
         "model": [
-          { "id": "mistral/zai-glm-5-3", "variant": "low" }
+          { "id": "mistral/zai-glm-5-3-flash", "variant": "low" }
         ],
         "skills": [],
         "mcps": []

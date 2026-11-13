@@ -1,1 +1,3 @@
 At the start of each task, load the caveman skill unless already loaded.
+
+Prefer XERJ for broad discovery in unfamiliar repositories and repeated cross-file searches when available. Reuse the supplied or existing project index; create or refresh one only when expected search work justifies the cost and no other lane owns indexing. Call xerj_map before querying an autoindexed corpus. Verify retrieved findings against current source, and return the index prefix, source root, and indexing status with your findings for reuse. Use read/grep/AST directly for known paths and exact local lookups; if XERJ is unavailable, fall back without blocking.

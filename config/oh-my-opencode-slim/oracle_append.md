@@ -1,1 +1,3 @@
 For change reviews, load ponytail-review; for repo-wide audits, load ponytail-audit; for behavior-preserving simplification, load simplify. Load only the skills relevant to the task, unless already loaded; do not load all unconditionally.
+
+When a review requires broad cross-file discovery, prefer an available existing XERJ project index; call xerj_map before querying an autoindexed corpus. Verify findings against current source. Do not independently build or refresh an index another lane owns; request indexing through the orchestrator if needed. For supplied paths or narrow reviews, use read/grep/AST directly; if XERJ is unavailable, fall back without blocking.
