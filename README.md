@@ -62,7 +62,7 @@ ocinbox/
 ### 1. Get the repository
 
 ```bash
-git clone https://github.com/vadmbertr/ocinbox.git
+git clone git@github.com:vadmbertr/ocinbox.git
 cd ocinbox
 chmod +x oc build.sh ocxerj
 mkdir -p config/skills home
