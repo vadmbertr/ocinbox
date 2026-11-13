@@ -9,8 +9,18 @@ OCI_IMAGE="${ocinbox_IMAGE:-ghcr.io/vadmbertr/ocinbox:latest}"
 LOCAL_IMAGE="ocinbox:local"
 SIF="$BOX/opencode.sif"
 
-case "$(uname -s)" in
-    Darwin)
+# Detect container runtime
+if command -v docker >/dev/null 2>&1; then
+    RUNTIME=docker
+elif command -v apptainer >/dev/null 2>&1; then
+    RUNTIME=apptainer
+else
+    echo "Unsupported operating system" >&2
+    exit 1
+fi
+
+case "$RUNTIME" in
+    docker)
         ACTION="${1:-build}"
         case "$ACTION" in
             build)
@@ -39,15 +49,10 @@ case "$(uname -s)" in
         esac
         ;;
 
-    Linux)
+    apptainer)
         # Convert OCI image to Apptainer SIF
         apptainer pull --force \
             "$SIF" \
             "docker://$OCI_IMAGE"
-        ;;
-
-    *)
-        echo "Docker or Apptainer CLI required" >&2
-        exit 1
         ;;
 esac
