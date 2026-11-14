@@ -4,25 +4,16 @@ set -euo pipefail
 BOX="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # Select runtime
-case "$(uname -s)" in
-    Darwin)
-        RUNTIME=docker
-        IMAGE="ocinbox:local"
-        ;;
-    Linux)
-        RUNTIME=apptainer
-        IMAGE="$BOX/opencode.sif"
-        ;;
-    *)
-        echo "Unsupported operating system" >&2
-        exit 1
-        ;;
-esac
-
-command -v "$RUNTIME" >/dev/null || {
-    echo "Missing runtime: $RUNTIME" >&2
+if command -v docker >/dev/null 2>&1; then
+    RUNTIME=docker
+    IMAGE="ocbox:local"
+elif command -v apptainer >/dev/null 2>&1; then
+    RUNTIME=apptainer
+    IMAGE="$BOX/opencode.sif"
+else
+    echo "Neither a working Docker runtime nor Apptainer is available" >&2
     exit 1
-}
+fi
 
 # Persistent home
 mkdir -p "$BOX/home"
