@@ -17,6 +17,7 @@ The launch script:
 - Reads host-to-container directory mappings from `dirs.txt`.
 - Copies Git-tracked OpenCode configuration, global instructions, agent customizations, and skills into the persistent home before starting.
 - Reads optional API keys from `secrets.env`.
+- Hands the host's GPU to the container when there is one.
 - Runs `ocxerj`, which starts XERJ and then OpenCode.
 - Can start in a particular project using `OC_PROJECT` while leaving the **entire** `/workspace` tree available.
 
@@ -129,6 +130,8 @@ OC_PROJECT=project-a ./oc
 For a convenient `oc` command from anywhere, add your `ocinbox` directory to `PATH`, or create a shell alias pointing to the absolute path of `oc`.
 
 `OC_PROJECT` sets the starting directory to `/workspace/<project>`. It does **not** limit OpenCode's access to other mounted projects. The relative project path must exist inside `/workspace`.
+
+**GPU:** On HPC, `oc` detects an NVIDIA GPU on the host and enables it for the container automatically; nothing to set, and on machines without a GPU nothing changes. Set `OC_GPU=0` to turn it off. Locally, set `OC_GPU=1` to request the GPU from Docker, which additionally requires the NVIDIA Container Toolkit.
 
 ## Git and GitHub access (optional)
 

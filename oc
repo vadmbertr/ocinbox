@@ -89,6 +89,16 @@ if [[ -n "$PROJECT" ]]; then
 fi
 WORKDIR="/workspace${PROJECT:+/$PROJECT}"
 
+# GPU passthrough: OC_GPU=0 off, 1 on; default on when the host driver is present
+gpu_args=()
+if [[ "${OC_GPU:-auto}" != 0 ]]; then
+    if [[ "$RUNTIME" == docker ]]; then
+        [[ "${OC_GPU:-auto}" == 1 ]] && gpu_args=(--gpus all)
+    elif [[ "${OC_GPU:-auto}" == 1 || -d /proc/driver/nvidia/gpus ]]; then
+        gpu_args=(--nv)
+    fi
+fi
+
 if [[ "$RUNTIME" == docker ]]; then
 
     # Allocate a TTY when running interactively
@@ -104,6 +114,7 @@ if [[ "$RUNTIME" == docker ]]; then
         -v "ocinbox-xerj:/home/oc/.local/share/xerj:rw" \
         "${binds[@]}" \
         -w "$WORKDIR" \
+        "${gpu_args[@]}" \
         "${env_args[@]}" \
         -e HOME=/home/oc \
         -e XDG_CONFIG_HOME=/home/oc/.config \
@@ -122,6 +133,7 @@ else
         --home "$BOX/home:/home/oc" \
         "${binds[@]}" \
         --pwd "$WORKDIR" \
+        "${gpu_args[@]}" \
         "${env_args[@]}" \
         --env XDG_CONFIG_HOME=/home/oc/.config \
         --env XDG_DATA_HOME=/home/oc/.local/share \
