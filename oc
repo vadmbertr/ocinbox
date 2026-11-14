@@ -6,7 +6,7 @@ BOX="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 # Select runtime
 if command -v docker >/dev/null 2>&1; then
     RUNTIME=docker
-    IMAGE="ocbox:local"
+    IMAGE="ocinbox:local"
 elif command -v apptainer >/dev/null 2>&1; then
     RUNTIME=apptainer
     IMAGE="$BOX/opencode.sif"
