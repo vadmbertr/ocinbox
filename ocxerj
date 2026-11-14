@@ -6,7 +6,7 @@ export HOME=/home/oc
 XERJ_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/xerj"
 # needs to run on every volume creation (so once only)
 # docker run --rm --user 0 \
-#   -v ocbox-xerj:/data \
+#   -v ocinbox-xerj:/data \
 #   alpine:3.20 \
 #   chown "$(id -u):$(id -g)" /data
 mkdir -p "$XERJ_DATA"
