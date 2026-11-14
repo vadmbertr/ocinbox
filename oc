@@ -18,6 +18,11 @@ fi
 # Persistent home
 mkdir -p "$BOX/home"
 
+# Persistent tmp
+OC_TMP="$BOX/home/tmp"
+mkdir -p "$OC_TMP"
+chmod 700 "$OC_TMP"
+
 # Prepare writable OpenCode configuration
 OC_CONFIG="$BOX/home/.config/opencode"
 mkdir -p "$OC_CONFIG/skills"
@@ -112,6 +117,8 @@ if [[ "$RUNTIME" == docker ]]; then
         --user "$(id -u):$(id -g)" \
         -v "$BOX/home:/home/oc:rw" \
         -v "ocinbox-xerj:/home/oc/.local/share/xerj:rw" \
+        -v "$OC_TMP:/tmp:rw" \
+        -v "$OC_TMP:/var/tmp:rw" \
         "${binds[@]}" \
         -w "$WORKDIR" \
         "${gpu_args[@]}" \
@@ -130,6 +137,7 @@ else
 
     exec apptainer exec \
         --containall \
+        --workdir "$OC_TMP" \
         --home "$BOX/home:/home/oc" \
         "${binds[@]}" \
         --pwd "$WORKDIR" \
