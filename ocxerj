@@ -62,7 +62,7 @@ done
 
 # Optional explicit reindexing
 if [[ "${OC_XERJ_INDEX:-0}" == "1" ]]; then
-    xerj autoindex "$PWD" || {
+    xerj autoindex "$PWD" --prefix "${OC_PROJECT:-ax}" || {
         status=$?
         # XERJ uses exit 3 for successful indexing with skipped/junk files.
         if [[ "$status" -ne 3 ]]; then

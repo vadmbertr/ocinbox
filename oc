@@ -110,6 +110,7 @@ if [[ "$RUNTIME" == docker ]]; then
         -e XDG_DATA_HOME=/home/oc/.local/share \
         -e XDG_CACHE_HOME=/home/oc/.cache \
         -e OC_XERJ_INDEX="${OC_XERJ_INDEX:-0}" \
+        -e OC_PROJECT="${OC_PROJECT:-}" \
         -e TERM="${TERM:-xterm-256color}" \
         "$IMAGE" \
         /usr/local/bin/ocxerj "$@"
@@ -126,6 +127,7 @@ else
         --env XDG_DATA_HOME=/home/oc/.local/share \
         --env XDG_CACHE_HOME=/home/oc/.cache \
         --env OC_XERJ_INDEX="${OC_XERJ_INDEX:-0}" \
+        --env OC_PROJECT="${OC_PROJECT:-}" \
         --env TERM="${TERM:-xterm-256color}" \
         "$IMAGE" \
         /usr/local/bin/ocxerj "$@"
